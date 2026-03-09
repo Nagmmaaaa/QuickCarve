@@ -1,9 +1,13 @@
 import axios from "axios";
 
-export const BASE_URL =
-  process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8000/api";
+const BASE_URL =
+  window.location.hostname === "localhost"
+    ? "http://127.0.0.1:8000/api"
+    : "https://quickcarve.onrender.com/api";
 
-const api = axios.create({ baseURL: BASE_URL });
+const api = axios.create({
+  baseURL: BASE_URL,
+});
 
 api.interceptors.request.use((config) => {
   const adminAccess = localStorage.getItem("admin_access");
