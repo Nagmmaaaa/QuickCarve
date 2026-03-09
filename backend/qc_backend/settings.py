@@ -46,7 +46,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:3001",
     "http://127.0.0.1:3001",
-    "https://quick-carve-3j6aovedb-nagmmaaakhan00-7251s-projects.vercel.app"
+]
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",
 ]
 
 ROOT_URLCONF = 'qc_backend.urls'
