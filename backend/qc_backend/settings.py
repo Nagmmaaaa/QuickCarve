@@ -44,9 +44,9 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    # Frontend dev server sometimes runs on 3001 (auto-chosen)
     "http://localhost:3001",
     "http://127.0.0.1:3001",
+    "https://quick-carve-3j6aovedb-nagmmaaakhan00-7251s-projects.vercel.app"
 ]
 
 ROOT_URLCONF = 'qc_backend.urls'
