@@ -5,6 +5,8 @@ const BASE_URL =
     ? "http://127.0.0.1:8000/api"
     : "https://quickcarve.onrender.com/api";
 
+console.log("API URL:", BASE_URL);
+
 const api = axios.create({
   baseURL: BASE_URL,
 });

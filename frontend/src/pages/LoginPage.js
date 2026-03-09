@@ -1,6 +1,6 @@
 // src/pages/LoginPage.js
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../api/http";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Box, Typography, TextField, Button } from "@mui/material";
@@ -22,21 +22,18 @@ function LoginPage() {
     setSubmitting(true);
 
     try {
-      const res = await axios.post(
-        "http://127.0.0.1:8000/api/auth/token/",
-        { username, password }
-      );
+      const res = await api.post("/auth/token/", {
+        username,
+        password,
+      });
 
       const { access } = res.data;
 
       localStorage.setItem("access", access);
 
-      const userRes = await axios.get(
-        "http://127.0.0.1:8000/api/users/me/",
-        {
-          headers: { Authorization: `Bearer ${access}` },
-        }
-      );
+      const userRes = await api.get("/users/me/", {
+        headers: { Authorization: `Bearer ${access}` },
+      });
 
       login(userRes.data);
       navigate(from, { replace: true });

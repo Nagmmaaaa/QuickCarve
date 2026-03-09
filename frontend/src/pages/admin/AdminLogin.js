@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../../api/http";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, TextField, Button } from "@mui/material";
 
@@ -18,23 +18,20 @@ function AdminLogin() {
 
     try {
       //  Get JWT token
-      const res = await axios.post(
-        "http://127.0.0.1:8000/api/auth/token/",
-        { username, password }
-      );
+      const res = await api.post("/auth/token/", {
+        username,
+        password,
+      });
 
       const { access } = res.data;
       localStorage.setItem("admin_access", access);
 
       //  Get user info
-      const userRes = await axios.get(
-        "http://127.0.0.1:8000/api/users/me/",
-        {
-          headers: {
-            Authorization: `Bearer ${access}`,
-          },
-        }
-      );
+      const userRes = await api.get("/users/me/", {
+        headers: {
+          Authorization: `Bearer ${access}`,
+        },
+      });
 
       //  Check admin permission
       if (userRes.data.is_staff) {

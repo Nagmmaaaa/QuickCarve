@@ -1,6 +1,6 @@
 // src/pages/RegisterPage.js
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../api/http";
 import { useNavigate, Link } from "react-router-dom";
 import { Typography, Box, TextField, Button } from "@mui/material";
 
@@ -19,7 +19,7 @@ function RegisterPage() {
     setSuccess("");
     setSubmitting(true);
     try {
-      const res = await axios.post("http://127.0.0.1:8000/api/users/register/", {
+      const res = await api.post("/users/register/", {
         username,
         email,
         password,

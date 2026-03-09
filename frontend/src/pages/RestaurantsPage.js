@@ -18,7 +18,7 @@ import {
   Restaurant as RestaurantIcon,
 } from "@mui/icons-material";
 import { Link, useSearchParams } from "react-router-dom";
-import axios from "axios";
+import api from "../api/http";
 import RestaurantCard from "../components/RestaurantCard";
 
 const norm = (s) => (s ?? "").toString().toLowerCase().trim();
@@ -105,8 +105,8 @@ const RestaurantsPage = () => {
   // Fetch restaurants from backend
   useEffect(() => {
     setLoading(true);
-    axios
-      .get("http://127.0.0.1:8000/api/restaurants/")
+    api
+      .get("/restaurants/")
       .then((response) => {
         const data = response.data;
         let list = [];
@@ -319,7 +319,7 @@ const RestaurantsPage = () => {
             ))}
           </Grid>
 
-        /* No Results */
+          /* No Results */
         ) : filtered.length === 0 ? (
           <Box sx={{ textAlign: "center", py: 10 }}>
             <RestaurantIcon sx={{ fontSize: 64, color: "#22c55e", mb: 2 }} />
@@ -340,7 +340,7 @@ const RestaurantsPage = () => {
             </Button>
           </Box>
 
-        /* Restaurant Grid */
+          /* Restaurant Grid */
         ) : (
           <>
             <Typography sx={{ color: "#666", mb: 3, fontSize: "0.9rem", maxWidth: 900, mx: "auto", pl: { xs: 0, sm: '12px' } }}>
