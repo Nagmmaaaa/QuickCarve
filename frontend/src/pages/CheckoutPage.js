@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import api from "../api/http";
 import {
   Box,
   Typography,
@@ -30,13 +31,30 @@ const CheckoutPage = () => {
   const tax = totalPrice * 0.05;
   const finalTotal = totalPrice + deliveryFee + tax;
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!address.name || !address.phone || !address.street || !address.city) {
       alert("Please fill all required fields");
       return;
     }
-    clearCart();
-    navigate("/order-success");
+
+    try {
+      const orderData = {
+        restaurant_id: cartItems[0]?.restaurant_id || 1,
+        items: cartItems.map((item) => ({
+          menu_item_id: item.id,
+          quantity: item.quantity,
+        })),
+      };
+
+      await api.post("/orders/", orderData);
+
+      clearCart();
+      navigate("/order-success");
+
+    } catch (error) {
+      console.error("Order creation failed:", error);
+      alert("Failed to place order");
+    }
   };
 
   if (cartItems.length === 0) {

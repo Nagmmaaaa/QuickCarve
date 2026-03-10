@@ -15,36 +15,35 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
-
+  
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSubmitting(true);
+  e.preventDefault();
 
-    try {
-      const res = await api.post("/auth/token/", {
-        username,
-        password,
-      });
+  try {
+    const res = await api.post("/auth/token/", {
+      username,
+      password,
+    });
 
-      const { access } = res.data;
+    const { access, refresh } = res.data;
 
-      localStorage.setItem("access", access);
+    // SAVE TOKENS FIRST
+    localStorage.setItem("access", access);
+    localStorage.setItem("refresh", refresh);
 
-      const userRes = await api.get("/users/me/", {
-        headers: { Authorization: `Bearer ${access}` },
-      });
+    // THEN fetch user
+    const userRes = await api.get("/me/");
 
-      login(userRes.data);
-      navigate(from, { replace: true });
+    login(userRes.data);
 
-    } catch (err) {
-      setError("Invalid username or password");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    navigate(from, { replace: true });
 
+  } catch (err) {
+    console.error(err);
+    setError("Invalid username or password");
+  }
+};
+ 
   return (
     <Box
       sx={{

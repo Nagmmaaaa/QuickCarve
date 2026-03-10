@@ -20,7 +20,6 @@ urlpatterns = [
     path('restaurant/login/', restaurant_login),
     path('profile/', user_profile),
     path('me/', current_user_detail),
-    path('users/me/', current_user_detail),
     path('users/users/', include(router.urls)),
     path('', include(router.urls)),
 ]
