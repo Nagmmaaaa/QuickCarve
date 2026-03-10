@@ -13,29 +13,30 @@ from restaurants.models import Restaurant
 
 class OrderViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = OrderSerializer
 
     def get_queryset(self):
         user = self.request.user
-        
-        # Check if user is restaurant owner
+
         restaurant = Restaurant.objects.filter(owner=user).first()
-        
+
         if restaurant:
-            # Restaurant owner sees their restaurant's orders
             return Order.objects.filter(restaurant=restaurant).order_by('-created_at')
         else:
-            # Regular customer sees their own orders
             return Order.objects.filter(customer=user).order_by('-created_at')
 
-    def create(self, request, *args, **kwargs):
-        serializer = OrderCreateSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            order = serializer.save()
-            read_serializer = OrderSerializer(order)
-            return Response(read_serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_serializer_class(self):
+        if self.action == "create":
+            return OrderCreateSerializer
+        return OrderSerializer
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+
+        read_serializer = OrderSerializer(order)
+        return Response(read_serializer.data, status=status.HTTP_201_CREATED)
+        
     @action(detail=True, methods=['patch'])
     def update_status(self, request, pk=None):
         """Update order status"""

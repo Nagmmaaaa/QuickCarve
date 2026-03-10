@@ -4,16 +4,20 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView
 
 from .models import Cart
-from .serializers import CartSerializer
+from .serializers import CartSerializer, CartCreateSerializer
 
 
 # USER CART LIST + ADD
 class CartListCreateView(generics.ListCreateAPIView):
-    serializer_class = CartSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Cart.objects.filter(user=self.request.user)
+    
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CartCreateSerializer
+        return CartSerializer
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

@@ -37,23 +37,87 @@ const CheckoutPage = () => {
       return;
     }
 
+    if (cartItems.length === 0) {
+      alert("Cart is empty");
+      return;
+    }
+
+    // Check if user is authenticated
+    const token = localStorage.getItem("access") || localStorage.getItem("admin_access");
+    if (!token) {
+      alert("Please log in to place an order");
+      navigate("/login");
+      return;
+    }
+
     try {
+      // Map cart items correctly for the API
+      const items = cartItems.map((item) => {
+        // Try multiple possible ID field names for menu item ID
+        const menuItemId = item.id || 
+                          item.menu_item_id || 
+                          item.menu_item?.id ||
+                          item.product_id || 
+                          item.item_id;
+        
+        if (!menuItemId) {
+          console.error("Cart item missing menu item ID. Item data:", item);
+          throw new Error(`Unable to find menu item ID for "${item.name}". Cart item data: ${JSON.stringify(item)}`);
+        }
+        
+        const qty = item.quantity || 1;
+        if (qty < 1) {
+          throw new Error(`Invalid quantity for ${item.name}`);
+        }
+        
+        console.log(`Order item: ${item.name} (ID: ${menuItemId}, Qty: ${qty})`);
+        
+        return {
+          menu_item: menuItemId,
+          quantity: qty,
+        };
+      });
+
+      if (items.length === 0) {
+        throw new Error("No valid items in cart");
+      }
+
       const orderData = {
-        restaurant_id: cartItems[0]?.restaurant_id || 1,
-        items: cartItems.map((item) => ({
-          menu_item_id: item.id,
-          quantity: item.quantity,
-        })),
+        restaurant_id: cartItems[0]?.restaurant_id || 7,  // Default to restaurant ID 7 (Native Bombay)
+        items: items,
       };
 
-      await api.post("/orders/", orderData);
+      console.log("Placing order with data:", orderData);
+
+      const response = await api.post("/orders/", orderData);
+
+      console.log("Order created successfully:", response.data);
+
+      const orderId = response.data.id;
 
       clearCart();
-      navigate("/order-success");
+
+      // Pass order details to success page
+      navigate("/order-success", { 
+        state: { 
+          orderId: response.data.id,
+          orderData: response.data,
+          cartItems: cartItems,
+          total: finalTotal,
+        } 
+      });
 
     } catch (error) {
-      console.error("Order creation failed:", error);
-      alert("Failed to place order");
+      console.error("Order creation error:", error);
+      if (error.response?.data) {
+        console.error("Backend error details:", error.response.data);
+        const messages = Object.values(error.response.data).flat().join(", ");
+        alert(`Failed to place order: ${messages}`);
+      } else if (error.message) {
+        alert(`Error: ${error.message}`);
+      } else {
+        alert("Failed to place order. Please try again.");
+      }
     }
   };
 

@@ -119,7 +119,10 @@ export const CartProvider = ({ children }) => {
       fetchCartFromBackend();
     } else {
       const stored = localStorage.getItem("cartItems");
-      setCartItems(stored ? JSON.parse(stored) : []);
+      const parsedItems = stored ? JSON.parse(stored) : [];
+      // Normalize items from localStorage to ensure they have proper ID field
+      const normalizedItems = normalizeCart(parsedItems);
+      setCartItems(normalizedItems);
     }
   }, [loggedIn]);
 
